@@ -6,14 +6,14 @@ class FileUploadRecord
 {
 
   private $link;
-  private $last_modified;
+  private $lastModified;
   private $etag;
 
   public function __construct(string $link, string $last_modified, string $etag)
   {
-    $this->link = $link;
-    $this->last_modified = $last_modified;
-    $this->etag = $etag;
+    $this->link         = $link;
+    $this->lastModified = $last_modified;
+    $this->etag         = $etag;
   }
 
   // TODO: parse for signed link (rel=signed)
@@ -24,7 +24,7 @@ class FileUploadRecord
 
   public function getLastModified(): string
   {
-    return $this->last_modified;
+    return $this->lastModified;
   }
 
   public function getETag(): string
