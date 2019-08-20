@@ -8,10 +8,12 @@
     "type": "git"
   },
   "license": "MIT",
-  "scripts" : {
+  "scripts": {
     "start": "node src/index.js"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "apollo-server": "^2.8.1",
+    "express": "^4.17.1",
+    "graphql": "^14.4.2"
   }
 }
