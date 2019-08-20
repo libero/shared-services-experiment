@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+
+ssh -i single-node--shared-services-experiment.key "ubuntu@$(terraform output single_node_ip)"
