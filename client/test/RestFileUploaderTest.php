@@ -10,6 +10,8 @@ use Libero\SharedServicesExperiment\Client\RestFileUploaderException;
 
 class RestFileUploaderTest extends TestCase
 {
+  // TODO: error when path is /files/file.ext (no namespace)
+
     private function makeMockRestFileUploader($mock)
     {
         $handler = HandlerStack::create($mock);
