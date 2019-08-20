@@ -7,11 +7,15 @@ const example_thing = {
   namespace: "reviewer"
 };
 
+
+const db_connection = require('../database');
+
+const { getFileMeta } = require('../controller');
+
 module.exports = {
   Query: {
-    getFileMeta: (_, { id }, ___) => {
-      console.log(id);
-      return example_thing;
+    getFileMeta: async (_, { id }, ___) => {
+      return await getFileMeta(db_connection, id);
     }
   },
   Mutation: {
