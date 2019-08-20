@@ -3,15 +3,14 @@
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use Libero\SharedServicesExperiment\Client\RestFileUploader;
+use Libero\SharedServicesExperiment\Client\GraphQLFileUploader;
 use Libero\SharedServicesExperiment\Client\FileUploaderException;
-use Psr\Http\Message\RequestInterface;
 
-class RestFileUploaderTest extends TestCase
+class GraphQLFileUploaderTest extends TestCase
 {
   // TODO: error when path is /files/file.ext (no namespace)
 
@@ -20,34 +19,40 @@ class RestFileUploaderTest extends TestCase
         $handler = HandlerStack::create($mock);
         $client  = new Client(['handler' => $handler]);
 
-        return new RestFileUploader($client);
+        return new GraphQLFileUploader($client);
     }
 
     public function testUploadFileIsSuccessful()
     {
-        $mockHeaders = [
-          'Link'          => 'http://user-facing-server/files/namespace/directory/file.ext',
-          'Last-Modified' => '2019-08-20 14:28:01.123456',
-          'ETag'          => 'someHashOrOtherForETag'
+        $data = [
+            'mimeType'     => 'application/txt',
+            'internalLink' => 'http://user-facing-server/files/namespace/directory/file.ext',
+            'namespace'    => 'namespace',
+            'path'         => 'directory/file.ext',
+            'size'         => 12345,
+            'updated'      => '2019-08-20 14:28:01.123456',
+            'tags'         => [
+                ['filename' => 'stub.txt']
+            ]
         ];
 
         $mock = new MockHandler([
-            new Response(201, $mockHeaders),
+            new Response(200, [], json_encode(['data' => $data])),
         ]);
 
         $fileUploader = $this->makeMockFileUploader($mock);
 
         $result = $fileUploader->uploadFile(__DIR__ . '/stub.txt', '/foo/bar.txt');
 
-        $this->assertEquals($mockHeaders['Link'], $result->getLink());
-        $this->assertEquals($mockHeaders['Last-Modified'], $result->getLastModified());
-        $this->assertEquals($mockHeaders['ETag'], $result->getETag());
+        $this->assertEquals($data['internalLink'], $result->getLink());
+        $this->assertEquals($data['updated'], $result->getLastModified());
+        $this->assertEquals('', $result->getETag());
     }
 
     public function testUploadFileFailsWhenFileDoesntExist()
     {
         $mock = new MockHandler([
-            new Response(201),
+            new Response(200),
         ]);
 
         $fileUploader = $this->makeMockFileUploader($mock);
@@ -60,27 +65,12 @@ class RestFileUploaderTest extends TestCase
     public function testUploadFileFailsWhenServerErrorOccurs()
     {
         $mock = new MockHandler([
-            new Response(500),
+            new Response(200, [], json_encode(['errors' => ['something went wrong']])),
         ]);
 
         $fileUploader = $this->makeMockFileUploader($mock);
 
         $this->expectException(FileUploaderException::class);
-        $this->expectExceptionCode(500);
-
-        $fileUploader->uploadFile(__DIR__ . '/stub.txt', '/foo/bar.txt');
-    }
-
-    public function testUploadFileFailsWhenServerReturnsWrongCode()
-    {
-        $mock = new MockHandler([
-            new Response(200),
-        ]);
-
-        $fileUploader = $this->makeMockFileUploader($mock);
-
-        $this->expectException(FileUploaderException::class);
-        $this->expectExceptionCode(200);
 
         $fileUploader->uploadFile(__DIR__ . '/stub.txt', '/foo/bar.txt');
     }
@@ -103,14 +93,11 @@ class RestFileUploaderTest extends TestCase
         /** @var \GuzzleHttp\ClientInterface $mock */
         $mock = $this->createMock(ClientInterface::class);
 
-        /** @var \Psr\Http\Message\RequestInterface $requestMock */
-        $requestMock = $this->createMock(RequestInterface::class);
-
         $mock->expects($this->once())
             ->method('request')
-            ->willThrowException(new ConnectException('server error', $requestMock));
+            ->willThrowException(new TransferException('server error'));
 
-        $fileUploader = new RestFileUploader($mock);
+        $fileUploader = new GraphQLFileUploader($mock);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('server error');
