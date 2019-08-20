@@ -14,6 +14,6 @@ const dbSetup = async () => {
 
 dbSetup()
   .then(() => console.log("dbsetup complete!"))
-  .catch((e) => console.error(e));
+  .catch(e => console.error(e));
 
 module.exports = knex;
