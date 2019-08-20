@@ -8,17 +8,8 @@ const knex = require("knex")({
 });
 
 const dbSetup = async () => {
-  await knex.schema.createTable("meta", table => {
-    table.string("id");
-    table.string("udpated"); // datetime
-    table.integer("size");
-    table.string("internalLink");
-    table.string("sharedLink");
-    table.string("publicLink");
-    table.jsonb("tags");
-    table.string("mimeType");
-    table.string("namespace");
-  });
+  // This is no longer done here, it is now done by the `run_migrations.sh` script
+  return {};
 };
 
 dbSetup()

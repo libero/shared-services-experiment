@@ -1,6 +1,8 @@
+const fileMetadataKnexRepository = require('./database/file_metadata');
+
 const fileMetaRepo = {
-  get: (knex) => {},
-  set: (knex) => {},
+  get: (knex, id) => fileMetadataKnexRepository.getMetadata(knex, id),
+  set: (knex, data) => fileMetadataKnexRepository.setMetadata(knex, data),
 }
 
 const fileDataRepo = {
