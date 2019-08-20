@@ -1,0 +1,17 @@
+{
+  "name": "storage-service",
+  "version": "1.0.0",
+  "description": "Shared service for storing and retrieving files and metadata",
+  "main": "src/index.js",
+  "repository": {
+    "url": "https://github.com/libero/shared-services-experiment",
+    "type": "git"
+  },
+  "license": "MIT",
+  "scripts" : {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
