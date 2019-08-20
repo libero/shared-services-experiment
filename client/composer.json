@@ -1,0 +1,23 @@
+{
+    "name": "libero/shared-services-experiment-client",
+    "type": "project",
+    "require": {
+        "guzzlehttp/guzzle": "~6.0",
+        "softonic/graphql-client": "^1.2"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Libero",
+            "email": "tech-team@libero.pub"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^7.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Libero\\SharedServicesExperiment\\Client\\": "src/"
+        }
+    }
+}
