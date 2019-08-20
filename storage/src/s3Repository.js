@@ -16,7 +16,7 @@ const s3 = new AWS.S3({
   signatureVersion: 'v4',
 });
 
-const set = (fStream, fData) => {
+const putFile = (fStream, fData) => {
   return s3
     .putObject({
       Body: fStream,
@@ -28,8 +28,8 @@ const set = (fStream, fData) => {
     .promise()
 }
 
-const get = (key) => {
+const getFile = (key) => {
   return s3.getObject({ key })
 }
 
-module.exports = { get, set }
+module.exports = { getFile, putFile }
