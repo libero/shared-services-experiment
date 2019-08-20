@@ -32,11 +32,11 @@ class RestFileUploader implements FileUploader
      *
      * @param string $sourcePath
      * @param string $uploadPath
-     * @return array
+     * @return FileUploadRecord
      * @throws InvalidArgumentException
      * @throws RestFileUploaderException
      */
-    public function uploadFile(string $sourcePath, string $uploadPath): array
+    public function uploadFile(string $sourcePath, string $uploadPath): FileUploadRecord
     {
         if (! file_exists($sourcePath)) {
             throw new InvalidArgumentException('File not found: ' . $sourcePath);
@@ -72,10 +72,10 @@ class RestFileUploader implements FileUploader
             throw new RestFileUploaderException('Error uploading file', $status);
         }
 
-        return [
-            'link'          => $response->getHeader('Link'),
-            'last_modified' => $response->getHeader('Last-Modified'),
-            'etag'          => $response->getHeader('ETag')
-        ];
+        return new FileUploadRecord(
+          $response->getHeader('Link')[0],
+          $response->getHeader('Last-Modified')[0],
+          $response->getHeader('ETag')[0]
+        );
     }
 }
