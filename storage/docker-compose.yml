@@ -14,6 +14,8 @@ services:
       - "3000:3000"
     working_dir: "/storage"
     command: ["bash", "-c", "yarn && yarn start"]
+    environment:
+      PG_HOST: database
     volumes:
       - .:/storage/:z
     networks:
