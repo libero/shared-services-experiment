@@ -1,8 +1,8 @@
 stop:
-	docker-compose down -v
+	docker-compose down
 
 configuration:
-	docker-compose up etcd1
+	docker-compose up
 
-health:
-	docker-compose exec etcd1 etcdctl endpoint health
+status:
+	docker-compose exec etcd1 etcdctl endpoint status
