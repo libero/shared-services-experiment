@@ -13,8 +13,8 @@ set -e
 echo "Create private bucket (private by default)"
 aws_cli s3 mb s3://private-bucket
 
-echo "Upload file to private bucket with custom meta data"
-aws_cli s3 cp ./assets/file.txt s3://private-bucket --content-type text/plain --metadata CustomMetaKey=CustomMetaValue
+echo "Upload file to private bucket with custom meta data (must use 'x-amz-meta-' prefix)"
+aws_cli s3 cp ./assets/file.txt s3://private-bucket --content-type text/plain --metadata x-amz-meta-custommetakey=CustomMetaValue
 
 echo "Get meta data about uploaded file"
 aws_cli s3api head-object --bucket private-bucket --key file.txt
