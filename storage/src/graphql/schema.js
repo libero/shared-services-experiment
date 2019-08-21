@@ -10,10 +10,9 @@ type Tag {
 }
 
 type FileMeta {
-  id: ID!
+  key: String! # link from the service
   updated: String!
   size: Int!
-  internalLink: String # link from the service
   sharedLink: String # signed url, generated when requested
   publicLink: String # accessbile to anyone if underlying storage publicly accessible
   tags: [Tag]
@@ -22,15 +21,9 @@ type FileMeta {
 }
 
 input FileMetaInput {
-  id: ID!
-  # updated: String! -- is computed
-  # size: Int! -- is computed
-  internalLink: String # link from the service
-  sharedLink: String # signed url, generated when requested
-  publicLink: String # accessbile to anyone if underlying storage publicly accessible
+  key: String! # link from the service
   tags: [TagInput]
-  # mimeType: String! -- is computed from the file
-  namespace: String! # Will eventually come from the user session?
+  namespace: String! # Will eventually come from the user session? context
 }
 input TagInput {
   key: String!
@@ -38,7 +31,7 @@ input TagInput {
 }
 
 type Query {
-  getFileMeta(id: String): FileMeta
+  getFileMeta(key: String): FileMeta
 }
 
 type Mutation {

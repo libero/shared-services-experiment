@@ -10,17 +10,22 @@ const example_thing = {
 
 const db_connection = require('../database');
 
-const { getFileMeta, uploadFile } = require('../controller');
+const { getFileMeta, uploadFile, getSharedLink } = require('../controller');
 
 module.exports = {
   Query: {
-    getFileMeta: (_, { id }, ___) => {
-      return getFileMeta(db_connection, id);
+    getFileMeta: (_, { key }, ___) => {
+      return getFileMeta(db_connection, key);
     }
   },
   Mutation: {
     uploadFile: async (_, {file, meta} , ___) => {
       return uploadFile(file, meta);
+    }
+  },
+  FileMeta: {
+    sharedLink: (fileMeta) => {
+      return getSharedLink(fileMeta);
     }
   }
 };

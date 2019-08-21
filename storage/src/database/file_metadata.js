@@ -1,10 +1,10 @@
 const { Option, None } = require("funfix");
 
 const fileMetadataKnexRepository = {
-  getMetadata: async (knex, id) => {
+  getMetadataByKey: async (knex, key) => {
     const result = Option.of(
       (await knex("metadata").where({
-        id
+        key
       }))[0]
     );
 
@@ -12,19 +12,15 @@ const fileMetadataKnexRepository = {
   },
 
   setMetadata: async (knex, data) => {
-    // if data has an id, then it's an insert, if data doesn't have an ID then it's an update
-    const existing_id = Option.of(data.id);
+    // Check if there's anything on this key?
+    const fileEntry = fileMetadataKnexRepository.getMetadataByKey(knex, data.key);
 
-    return await existing_id.map(async (id) => {
+    if (fileEntry) {
       // Use an existing one
-      return await knex('metadata').where({id}).update(data);
-
-    }).getOrElseL(async () => {
-      // Create a new thing
-      // Prepare the data?
-      return await knex('metadata').insert(data);
-
-    })
+      return knex('metadata').where({id: fileEntry.id}).update(data);
+    } 
+    // Create a new thing
+    return await knex('metadata').insert(data);
   }
 };
 

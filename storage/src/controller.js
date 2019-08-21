@@ -3,18 +3,21 @@ const { fileMetaRepo, fileDataRepo } = require('../repositories');
 const { UserInputError } = require('apollo-server-express');
 
 // Get the file from S3
-async function getFileMeta(db_connection, file_id) {
-  const out = await fileMetaRepo.get(db_connection, file_id);
+async function getFileMeta(db_connection, key) {
+  const out = await fileMetaRepo.get(db_connection, key);
   return out.getOrElseL(() => {throw new UserInputError("file not found")});
 }
 
 async function uploadFile(file, fileData) {
   const { stream, filename, mimetype, encoding } = await file;
 
+  let fileSize = 0;
+
   const fileContent = await new Promise((resolve, reject) => {
     const chunks = [];
     stream.on('data', chunk => {
-      chunks.push(chunk)
+      fileSize += chunk.length;
+      chunks.push(chunk);
     });
     stream.on('error', () => { 
       console.error(`Error reading stream for file: ${fileData.id}`, err);
@@ -27,35 +30,34 @@ async function uploadFile(file, fileData) {
 
   // store file
   await fileDataRepo.putFile(fileContent, fileData);
+
   // store meta
   const newFile = {
     id: undefined,
-    internalLink: '',
-    sharedLink: '',
+    key: fileData.key,
+    // How are we generating this? It might be a cdn link? config.publicPrefix + '/' + fileData.key?
     publicLink: '',
-    tags: [{ filename }],
-    namespace: 'libero',
-
-    // computed fields
+    tags: [{ filename }, ...fileData.tags],
+    namespace: fileData.namespace,
     mimeType: mimetype,
-    // Compute the size later?
-    // Some other stuff
+    size: fileSize
   };
-
-  const ret = fileMetaRepo.set(db_connection, newFile);
   // Create a file object
 
   // TODO: Validate the file metadata and stuff
 
   // TODO: Pass the file into the thing
 
-  console.log("uploadFile");
-  return { implemented: false };
+  return fileMetaRepo.set(db_connection, newFile);;
 }
 
-function getFile(namespace, id) {
+function getFile(namespace, key) {
   // Returns a file stream
-  return fileDataRepo.getFile(namespace, id);
+  return fileDataRepo.getFile(namespace, key);
 }
 
-module.exports = { getFile, getFileMeta, uploadFile };
+function getSharedLink(fileMeta) {
+  return fileDataRepo.getSharedLink(fileMeta.namespace, fileMeta.key);
+}
+
+module.exports = { getFile, getFileMeta, uploadFile, getSharedLink };

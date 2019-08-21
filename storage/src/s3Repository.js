@@ -27,7 +27,7 @@ const putFile = (fStream, fData) => {
     .putObject({
       Body: fStream,
       Bucket: CONFIG[fData.namespace].S3_BUCKET,
-      Key: fData.internalLink,
+      Key: fData.key,
       ContentType: fData.mimeType,
       ContentLength: fData.size,
       ACL: CONFIG[fData.namespace].S3_ACL,
@@ -35,16 +35,16 @@ const putFile = (fStream, fData) => {
     .promise()
 }
 
-const getFile = (namespace, id) => {
+const getFile = (namespace, key) => {
   const s3 = getS3Instance(CONFIG[namespace].AWS_CREDENTIALS);
-  return s3.getObject({ Bucket: CONFIG[namespace].S3_BUCKET, Key: id })
+  return s3.getObject({ Bucket: CONFIG[namespace].S3_BUCKET, Key: key })
 }
 
-const getSharedLink = (namespace, id) => {
+const getSharedLink = (namespace, key) => {
   const s3 = getS3Instance(CONFIG[namespace].AWS_CREDENTIALS);
   return s3.getSignedUrl('getObject', {
     Bucket: CONFIG[namespace].S3_BUCKET,
-    Key: id,
+    Key: key,
   })
 }
 

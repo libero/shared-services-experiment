@@ -2,13 +2,13 @@ const fileMetadataKnexRepository = require('./database/file_metadata');
 const fileDataRepository = require('./s3Repository')
 
 const fileMetaRepo = {
-  get: (knex, id) => fileMetadataKnexRepository.getMetadata(knex, id),
+  get: (knex, key) => fileMetadataKnexRepository.getMetadataByKey(knex, key),
   set: (knex, data) => fileMetadataKnexRepository.setMetadata(knex, data),
 }
 
 const fileDataRepo = {
-  getFile: (namespace, id) => fileDataRepository.getFile(namespace, id),
-  getSharedLink: (namespace, id) => fileDataRepository.getSharedLink(namespace, id),
+  getFile: (namespace, key) => fileDataRepository.getFile(namespace, key),
+  getSharedLink: (namespace, key) => fileDataRepository.getSharedLink(namespace, key),
   putFile: (fileStream, data) => fileDataRepository.putFile(fileStream, data),
 }
 
