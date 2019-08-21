@@ -30,7 +30,7 @@ echo "Create public read-only bucket"
 aws_cli s3 mb s3://public-bucket
 
 echo "Apply bucket policy"
-aws_cli s3api put-bucket-policy --bucket public-bucket --policy file://policy.json
+aws_cli s3api put-bucket-policy --bucket public-bucket --policy file://aws-policies/public-download-policy.json
 
 echo "Get public bucket policy"
 aws_cli s3api get-bucket-policy --bucket public-bucket

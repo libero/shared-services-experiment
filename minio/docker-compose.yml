@@ -13,7 +13,7 @@ services:
   file-ops:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.aws-cli
     working_dir: /srv
     entrypoint: ""
     command: ./scripts/file-operations.sh
