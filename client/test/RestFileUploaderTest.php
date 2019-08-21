@@ -26,9 +26,11 @@ class RestFileUploaderTest extends TestCase
     public function testUploadFileIsSuccessful()
     {
         $mockHeaders = [
-          'Link'          => 'http://user-facing-server/files/namespace/directory/file.ext',
-          'Last-Modified' => '2019-08-20 14:28:01.123456',
-          'ETag'          => 'someHashOrOtherForETag'
+          'Link'           => 'http://user-facing-server/files/namespace/directory/file.ext',
+          'Last-Modified'  => '2019-08-20 14:28:01.123456',
+          'ETag'           => 'someHashOrOtherForETag',
+          'Content-Type'   => 'application/text',
+          'Content-Length' => 12345
         ];
 
         $mock = new MockHandler([
@@ -41,6 +43,8 @@ class RestFileUploaderTest extends TestCase
 
         $this->assertEquals($mockHeaders['Link'], $result->getLink());
         $this->assertEquals($mockHeaders['Last-Modified'], $result->getLastModified());
+        $this->assertEquals($mockHeaders['Content-Type'], $result->getContentType());
+        $this->assertEquals($mockHeaders['Content-Length'], $result->getSize());
         $this->assertEquals($mockHeaders['ETag'], $result->getETag());
     }
 

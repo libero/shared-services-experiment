@@ -25,13 +25,13 @@ class GraphQLFileUploaderTest extends TestCase
     public function testUploadFileIsSuccessful()
     {
         $data = [
-            'mimeType'     => 'application/txt',
-            'internalLink' => 'http://user-facing-server/files/namespace/directory/file.ext',
-            'namespace'    => 'namespace',
-            'path'         => 'directory/file.ext',
-            'size'         => 12345,
-            'updated'      => '2019-08-20 14:28:01.123456',
-            'tags'         => [
+            'mimeType'   => 'application/txt',
+            'sharedLink' => 'http://user-facing-server/files/namespace/directory/file.ext',
+            'namespace'  => 'namespace',
+            'path'       => 'directory/file.ext',
+            'size'       => 12345,
+            'updated'    => '2019-08-20 14:28:01.123456',
+            'tags'       => [
                 ['filename' => 'stub.txt']
             ]
         ];
@@ -44,7 +44,7 @@ class GraphQLFileUploaderTest extends TestCase
 
         $result = $fileUploader->uploadFile(__DIR__ . '/stub.txt', '/foo/bar.txt');
 
-        $this->assertEquals($data['internalLink'], $result->getLink());
+        $this->assertEquals($data['sharedLink'], $result->getLink());
         $this->assertEquals($data['updated'], $result->getLastModified());
         $this->assertEquals('', $result->getETag());
     }

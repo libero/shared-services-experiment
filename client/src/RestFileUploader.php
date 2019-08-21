@@ -34,11 +34,11 @@ class RestFileUploader
      *
      * @param string $sourcePath
      * @param string $uploadPath
-     * @return FileUploadRecord
+     * @return FileRecord
      * @throws InvalidArgumentException
      * @throws FileUploadException
      */
-    public function uploadFile(string $sourcePath, string $uploadPath): FileUploadRecord
+    public function uploadFile(string $sourcePath, string $uploadPath): FileRecord
     {
         if (! file_exists($sourcePath)) {
             throw new InvalidArgumentException('File not found: ' . $sourcePath);
@@ -76,10 +76,6 @@ class RestFileUploader
             throw new FileUploadException('Error uploading file', $status);
         }
 
-        return new FileUploadRecord(
-          $response->getHeader('Link')[0],
-          $response->getHeader('Last-Modified')[0],
-          $response->getHeader('ETag')[0]
-        );
+        return FileRecord::buildFromResponse($response);
     }
 }

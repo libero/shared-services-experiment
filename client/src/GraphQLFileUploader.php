@@ -22,7 +22,7 @@ class GraphQLFileUploader
         $this->client = new GraphQLClient($client, new ResponseBuilder());
     }
 
-    public function uploadFile(string $sourcePath, string $uploadPath): FileUploadRecord
+    public function uploadFile(string $sourcePath, string $uploadPath): FileRecord
     {
         if (! file_exists($sourcePath)) {
             throw new InvalidArgumentException('File not found: ' . $sourcePath);
@@ -76,6 +76,6 @@ QUERY;
 
         $data = $response->getData();
 
-        return new FileUploadRecord($data['internalLink'], $data['updated'], '');
+        return FileRecord::buildFromData($data);
     }
 }
