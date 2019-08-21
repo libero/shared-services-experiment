@@ -18,6 +18,30 @@ async function uploadFile(file, fileData) {
   // store file
   await fileDataRepo.putFile(fileStream, fileData);
   // store meta
+  const { stream, filename, mimetype, encoding } = await file;
+
+  const newFile = {
+    id: undefined,
+    internalLink: '',
+    sharedLink: '',
+    publicLink: '',
+    tags: [{ filename }],
+    namespace: 'libero',
+
+    // computed fields
+    mimeType: mimetype,
+    // Compute the size later?
+    // Some other stuff
+  };
+
+  const ret = fileMetaRepo.set(db_connection, newFile);
+  // Create a file object
+
+  // TODO: Validate the file metadata and stuff
+
+  // TODO: Pass the file into the thing
+
+  console.log("uploadFile");
   return { implemented: false };
 }
 

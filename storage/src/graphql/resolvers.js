@@ -19,7 +19,13 @@ module.exports = {
     }
   },
   Mutation: {
-    uploadFile: (_, {}, ___) => {
+    uploadFile: async (_, {file} , ___) => {
+      const { stream, filename, mimetype, encoding } = await file;
+
+      // TODO: Validate the file metadata and stuff
+
+      // TODO: Pass the file into the thing
+
       console.log("uploadFile");
       return example_thing;
     }

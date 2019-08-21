@@ -12,7 +12,19 @@ const fileMetadataKnexRepository = {
   },
 
   setMetadata: async (knex, data) => {
-    return knex("metadata").insert(data);
+    // if data has an id, then it's an insert, if data doesn't have an ID then it's an update
+    const existing_id = Option.of(data.id);
+
+    return await existing_id.map(async (id) => {
+      // Use an existing one
+      return await knex('metadata').where({id}).update(data);
+
+    }).getOrElseL(async () => {
+      // Create a new thing
+      // Prepare the data?
+      return await knex('metadata').insert(data);
+
+    })
   }
 };
 

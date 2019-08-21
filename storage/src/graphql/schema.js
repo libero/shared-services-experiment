@@ -23,14 +23,14 @@ type FileMeta {
 
 input FileMetaInput {
   id: ID!
-  updated: String!
-  size: Int!
+  # updated: String! -- is computed
+  # size: Int! -- is computed
   internalLink: String # link from the service
   sharedLink: String # signed url, generated when requested
   publicLink: String # accessbile to anyone if underlying storage publicly accessible
   tags: [TagInput]
-  mimeType: String!
-  namespace: String!
+  # mimeType: String! -- is computed from the file
+  namespace: String! # Will eventually come from the user session?
 }
 input TagInput {
   key: String!
@@ -44,7 +44,6 @@ type Query {
 type Mutation {
   uploadFile(file: Upload, meta: FileMetaInput): FileMeta!
 }
-
 `;
 
 module.exports = typeDefs;
