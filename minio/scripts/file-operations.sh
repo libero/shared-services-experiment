@@ -24,7 +24,7 @@ public_url=$(aws_cli s3 presign s3://private-bucket/file.txt)
 echo $public_url
 
 echo "Download file in private bucket using public url (i.e. without using credentials)"
-wget $public_url -O ./file.txt
+wget $public_url -O ./private-file.txt
 
 echo "Create public read-only bucket"
 aws_cli s3 mb s3://public-bucket
@@ -42,7 +42,7 @@ echo "Get meta data about uploaded file"
 aws_cli s3api head-object --bucket public-bucket --key file.txt
 
 echo "Get file from public bucket without credentials"
-wget http://minio:9000/public-bucket/file.txt -O ./file1.txt
+wget http://minio:9000/public-bucket/file.txt -O ./public-file.txt
 
 echo "Clean up downloaded files"
-rm file.txt file1.txt
+rm private-file.txt public-file1.txt
