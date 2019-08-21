@@ -2,24 +2,31 @@
 
 namespace Libero\SharedServicesExperiment\Client;
 
+use RuntimeException;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\ConnectException;
 use Libero\SharedServicesExperiment\Client\FileRecord;
-use Psr\Http\Message\ResponseInterface;
 
 class RestFileRetriever
 {
+    private $client;
 
-  private $client;
+    public function __construct(ClientInterface $client)
+    {
+        $this->client = $client;
+    }
 
-  public function __construct(ClientInterface $client)
-  {
-    $this->client = $client;
-  }
+    public function retrieveFile(string $path): FileRecord
+    {
+        try {
+            $response = $this->client->request('GET', $path);
 
-  public function retrieveFile(string $path): FileRecord
-  {
-    $response =  $this->client->request('GET', $path);
-    return new FileRecord($response);
-  }
-
+            return new FileRecord($response);
+        } catch (BadResponseException $e) {
+            throw new FileRetrievalException('Error retrieving file: ' . $path, $e->getCode(), $e);
+        } catch (ConnectException $e) {
+            throw new RuntimeException('Network Error. ' . $e->getMessage(), $e->getCode(), $e);
+        }
+    }
 }
