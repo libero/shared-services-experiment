@@ -58,6 +58,41 @@ class RestFileRetrieverTest extends TestCase
         );
     }
 
+    public function testRetrieveFileMetaIsSuccessful()
+    {
+        $bodyContent = 'The file contents';
+        $mockHeaders = [
+          'Content-Type'     => 'application/pdf',
+          'Content-Length'   => strlen($bodyContent),
+          'Libero-file-tags' => 'tag1=value1,tag2=value2',
+          'Link'             => 'http://server/files/namespace/directory/file.ext',
+          'Last-Modified'    => '2019-08-20 14:28:01.123456',
+          'ETag'             => 'someHashOrOtherForETag',
+        ];
+
+        $mock = new MockHandler([
+            new Response(200, $mockHeaders, null),
+        ]);
+
+        $fileRetriever = $this->makeMockFileRetriever($mock);
+
+        $result = $fileRetriever->retrieveFileMeta('some-path');
+
+        $this->assertEquals(null, $result->getBody());
+        $this->assertEquals($mockHeaders['Content-Type'], $result->getContentType());
+        $this->assertEquals($mockHeaders['ETag'], $result->getETag());
+        $this->assertEquals($mockHeaders['Last-Modified'], $result->getLastModified());
+        $this->assertEquals($mockHeaders['Link'], $result->getLink());
+        $this->assertEquals($mockHeaders['Content-Length'], $result->getSize());
+        $this->assertEquals(
+          [
+            'tag1' => 'value1',
+            'tag2' => 'value2',
+          ],
+          $result->getTags()
+        );
+    }
+
     public function testRetrieveFileFailsWhenInvalidPath()
     {
         $mock = new MockHandler([

@@ -29,4 +29,17 @@ class RestFileRetriever
             throw new RuntimeException('Network Error. ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
+
+    public function retrieveFileMeta(string $path): FileRecord
+    {
+        try {
+            $response = $this->client->request('HEAD', $path);
+
+            return FileRecord::buildFromResponse($response);
+        } catch (BadResponseException $e) {
+            throw new FileRetrievalException('Error retrieving file: ' . $path, $e->getCode(), $e);
+        } catch (ConnectException $e) {
+            throw new RuntimeException('Network Error. ' . $e->getMessage(), $e->getCode(), $e);
+        }
+    }
 }

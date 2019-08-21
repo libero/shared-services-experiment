@@ -89,6 +89,7 @@ class GraphQLFileRetrieverTest extends TestCase
 
         $result = $fileRetriever->retrieveFileMeta('some-path');
 
+        $this->assertEquals(null, $result->getBody());
         $this->assertEquals($fileMeta['data']['mimeType'], $result->getContentType());
         $this->assertEquals($fileMeta['data']['sharedLink'], $result->getLink());
         $this->assertEquals($fileMeta['data']['size'], $result->getSize());
