@@ -4,4 +4,28 @@ services:
     image: postgres:9
     ports:
       - "5432:5432"
+    networks:
+      - infra_postgres
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+  server:
+    image: node:10
+    ports:
+      - "3000:3000"
+    working_dir: "/storage"
+    command: ["bash", "-c", "yarn && yarn start"]
+    environment:
+      PG_HOST: database
+    volumes:
+      - .:/storage/:z
+    networks:
+      - infra_postgres
+      - infra_api
+    depends_on: ["database"]
 
+networks:
+  infra_postgres:
+  infra_api:
+
+volumes:
+  pg-data:

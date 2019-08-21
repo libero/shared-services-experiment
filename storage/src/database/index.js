@@ -1,7 +1,7 @@
 
 const DATABASE_CONFIG = {
   DB_TYPE: 'pg',
-  DB_HOST: 'localhost',
+  DB_HOST: process.env.PG_HOST || 'localhost',
   DB_USER: "postgres",
   DB_DATABASE: "storage_service"
 }
