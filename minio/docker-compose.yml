@@ -1,0 +1,27 @@
+version: "3.4"
+
+services:
+  minio:
+    image: minio/minio:latest
+    command: server /data
+    environment:
+      MINIO_ACCESS_KEY: longkey
+      MINIO_SECRET_KEY: verysecretkey
+    ports:
+      - 9000:9000
+
+  file-ops:
+    build:
+      context: .
+      dockerfile: Dockerfile.aws-cli
+    working_dir: /srv
+    entrypoint: ""
+    command: ./scripts/file-operations.sh
+    volumes:
+      - ./:/srv
+    depends_on:
+      - minio
+    environment:
+      WAIT_HOSTS: minio:9000
+      AWS_ACCESS_KEY_ID: longkey
+      AWS_SECRET_ACCESS_KEY: verysecretkey
