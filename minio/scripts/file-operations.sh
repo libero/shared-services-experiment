@@ -1,26 +1,48 @@
 #!/bin/sh
 
+aws_cli() {
+  aws --endpoint-url http://minio:9000 $@
+}
+
 set -e
 
 # Executable that waits for a port at an address to be open.
 # For further details go to: https://github.com/ufoscout/docker-compose-wait
 /wait
 
-echo "Add s3 location alias called storage to minio config"
-mc config host add storage http://minio:9000 longkey verysecretkey
-
 echo "Create private bucket (private by default)"
-mc mb storage/private-bucket
+aws_cli s3 mb s3://private-bucket
 
-echo "Upload file to private bucket"
-mc cp ./assets/file.txt storage/private-bucket
+echo "Upload file to private bucket with custom meta data"
+aws_cli s3 cp ./assets/file.txt s3://private-bucket --content-type text/plain --metadata CustomMetaKey=CustomMetaValue
 
 echo "Get meta data about uploaded file"
-mc stat storage/private-bucket/file.txt
+aws_cli s3api head-object --bucket private-bucket --key file.txt
 
 echo "Get public url for uploaded file"
-PUBLIC_URL=$(mc share download storage/private-bucket/file.txt --json | jq '.share' | cut -d '"' -f 2)
-echo $PUBLIC_URL
+public_url=$(aws_cli s3 presign s3://private-bucket/file.txt)
+echo $public_url
 
 echo "Download file in private bucket using public url (i.e. without using credentials)"
-wget $PUBLIC_URL -O ./file.txt
+wget $public_url -O ./file.txt
+
+echo "Create public read-only bucket"
+aws_cli s3 mb s3://public-bucket
+
+echo "Apply bucket policy"
+aws_cli s3api put-bucket-policy --bucket public-bucket --policy file://policy.json
+
+echo "Get public bucket policy"
+aws_cli s3api get-bucket-policy --bucket public-bucket
+
+echo "Upload file to public bucket"
+aws_cli s3 cp ./assets/file.txt s3://public-bucket --content-type text/plain --metadata CustomMetaKey=CustomMetaValue
+
+echo "Get meta data about uploaded file"
+aws_cli s3api head-object --bucket public-bucket --key file.txt
+
+echo "Get file from public bucket without credentials"
+wget http://minio:9000/public-bucket/file.txt -O ./file1.txt
+
+echo "Clean up downloaded files"
+rm file.txt file1.txt
