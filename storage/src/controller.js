@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 // Controller (Use-cases)
 const { fileMetaRepo, fileDataRepo } = require('../repositories');
 const { UserInputError } = require('apollo-server-express');
@@ -11,15 +9,25 @@ async function getFileMeta(db_connection, file_id) {
 }
 
 async function uploadFile(file, fileData) {
-  var fileStream = fs.createReadStream(file);
-  fileStream.on('error', function(err) {
-    console.error(`Error reading stream for file: ${fileData.id}`, err);
-  });
-  // store file
-  await fileDataRepo.putFile(fileStream, fileData);
-  // store meta
   const { stream, filename, mimetype, encoding } = await file;
 
+  const fileContent = await new Promise((resolve, reject) => {
+    const chunks = [];
+    stream.on('data', chunk => {
+      chunks.push(chunk)
+    });
+    stream.on('error', () => { 
+      console.error(`Error reading stream for file: ${fileData.id}`, err);
+      reject();
+    });
+    stream.on('end', () => {
+      resolve(Buffer.concat(chunks))
+    });
+  })
+
+  // store file
+  await fileDataRepo.putFile(fileContent, fileData);
+  // store meta
   const newFile = {
     id: undefined,
     internalLink: '',
