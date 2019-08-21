@@ -22,7 +22,7 @@ class RestFileRetriever
         try {
             $response = $this->client->request('GET', $path);
 
-            return new FileRecord($response);
+            return FileRecord::buildFromResponse($response);
         } catch (BadResponseException $e) {
             throw new FileRetrievalException('Error retrieving file: ' . $path, $e->getCode(), $e);
         } catch (ConnectException $e) {

@@ -25,7 +25,14 @@ class GraphQLFileRetrieverTest extends TestCase
 
     public function testRetrieveFileIsSuccessful()
     {
-        $fileMeta = [ 'data' => ['sharedLink' => 'http://some-link'] ];
+        $fileMeta = ['data' => [
+                'sharedLink' => 'http://some-link',
+                'mimeType'   => 'application/pdf',
+                'size'       => 12345,
+                'updated'    => '2019-08-20 14:28:01.123456',
+                'namespace'  => 'namespace'
+            ]
+        ];
         $bodyContent = 'The file contents';
         $mockHeaders = [
           'Content-Type' => 'application/pdf',
@@ -60,4 +67,86 @@ class GraphQLFileRetrieverTest extends TestCase
         );
     }
 
+    public function testRetriveFileMetaIsSuccessful()
+    {
+        $fileMeta = ['data' => [
+            'sharedLink' => 'http://some-link',
+            'mimeType'   => 'application/pdf',
+            'size'       => 12345,
+            'updated'    => '2019-08-20 14:28:01.123456',
+            'namespace'  => 'namespace',
+            'tags'       => [
+                'tag1' => 'value1',
+                'tag2' => 'value2',
+            ]
+        ]];
+
+        $mock = new MockHandler([
+            new Response(200, [], json_encode($fileMeta)),
+        ]);
+
+        $fileRetriever = $this->makeMockFileRetriever($mock);
+
+        $result = $fileRetriever->retrieveFileMeta('some-path');
+
+        $this->assertEquals($fileMeta['data']['mimeType'], $result->getContentType());
+        $this->assertEquals($fileMeta['data']['sharedLink'], $result->getLink());
+        $this->assertEquals($fileMeta['data']['size'], $result->getSize());
+        $this->assertEquals($fileMeta['data']['updated'], $result->getLastModified());
+        $this->assertEquals(
+          [
+            'tag1' => 'value1',
+            'tag2' => 'value2',
+          ],
+          $result->getTags()
+        );
+    }
+
+    public function testRetrieveFileFailsWhenServerErrorOccurs()
+    {
+        $mock = new MockHandler([
+            new Response(404)
+        ]);
+
+        $fileRetriever = $this->makeMockFileRetriever($mock);
+
+        $this->expectException(FileRetrievalException::class);
+        $this->expectExceptionMessage('Error retrieving file: some-path');
+
+        $fileRetriever->retrieveFile('some-path');
+    }
+
+    public function testRetrieveFileFailsWhenInternalErrorOccurs()
+    {
+        $mock = new MockHandler([
+            new Response(500)
+        ]);
+
+        $fileRetriever = $this->makeMockFileRetriever($mock);
+
+        $this->expectException(FileRetrievalException::class);
+        $this->expectExceptionMessage('Error retrieving file: some-path');
+
+        $fileRetriever->retrieveFile('some-path');
+    }
+
+    public function testRetrieveFileFailsWhenNetworkErrorOccurs()
+    {
+         /** @var \GuzzleHttp\ClientInterface $mock */
+         $mock = $this->createMock(ClientInterface::class);
+
+         /** @var \Psr\Http\Message\RequestInterface $requestMock */
+         $requestMock = $this->createMock(RequestInterface::class);
+
+         $mock->expects($this->once())
+             ->method('request')
+             ->willThrowException(new ConnectException('network failure', $requestMock));
+
+         $fileRetriever = new GraphQLFileRetriever($mock);
+
+         $this->expectException(RuntimeException::class);
+         $this->expectExceptionMessage('Network Error.network failure');
+
+         $fileRetriever->retrieveFile('some-path');
+    }
 }

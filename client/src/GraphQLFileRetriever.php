@@ -2,12 +2,11 @@
 
 namespace Libero\SharedServicesExperiment\Client;
 
+use RuntimeException;
 use GuzzleHttp\Exception\BadResponseException;
 use Softonic\GraphQL\Client as GraphQLClient;
 use Softonic\GraphQL\ResponseBuilder;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\TransferException;
-
 use function GuzzleHttp\Psr7\stream_for;
 
 class GraphQLFileRetriever
@@ -28,7 +27,14 @@ class GraphQLFileRetriever
 
     public function retrieveFile(string $path): FileRecord
     {
-      $query = <<<'QUERY'
+        $fileRecord = $this->retrieveFileMeta($path);
+
+        return $this->restFileRetriever->retrieveFile($fileRecord->getLink());
+    }
+
+    public function retrieveFileMeta(string $path): FileRecord
+    {
+        $query = <<<'QUERY'
         query GetFileMeta(key: String) {
             getFileMeta {
                 updated,
@@ -50,16 +56,17 @@ QUERY;
             if ($response->hasErrors()) {
                 throw new FileUploadException(); // ?????
             }
-        } catch (TransferException $e) {
+        } catch (RuntimeException $e) {
           $originalException = $e->getPrevious();
+
           if ($originalException instanceof BadResponseException) {
-            throw new FileRetrievalException($originalException->getMessage());
+            throw new FileRetrievalException('Error retrieving file: ' . $path);
           }
           throw $e;
         }
 
         $data = $response->getData();
 
-        return $this->restFileRetriever->retrieveFile($data['sharedLink']);
+        return FileRecord::buildFromData($data);
     }
 }

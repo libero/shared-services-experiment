@@ -16,15 +16,21 @@ class FileRecord
   private $size;
   private $tags;
 
-  public function __construct(ResponseInterface $response)
+  private function __construct()
   {
-    $this->body = $response->getBody();
-    $this->contentType = $response->getHeader('Content-Type')[0];
-    $this->etag = $response->getHeader('ETag')[0];
-    $this->lastModified = $response->getHeader('Last-Modified')[0];
-    $this->link = $response->getHeader('Link')[0];
-    $this->size = $response->getHeader('Content-Length')[0];
-    $this->tags = array_reduce(
+  }
+
+  public static function buildFromResponse(ResponseInterface $response): self
+  {
+    $instance = new static;
+
+    $instance->body = $response->getBody();
+    $instance->contentType = $response->getHeader('Content-Type')[0];
+    $instance->etag = $response->getHeader('ETag')[0];
+    $instance->lastModified = $response->getHeader('Last-Modified')[0];
+    $instance->link = $response->getHeader('Link')[0];
+    $instance->size = $response->getHeader('Content-Length')[0];
+    $instance->tags = array_reduce(
       explode(',', $response->getHeader('Libero-file-tags')[0]),
       function ($carry, $item) {
         list($key, $value) = explode('=', $item, 2);
@@ -33,6 +39,22 @@ class FileRecord
       },
       []
     );
+
+    return $instance;
+  }
+
+  public static function buildFromData(array $data): self
+  {
+      $instance = new static;
+
+      $instance->contentType  = $data['mimeType'];
+      $instance->size         = $data['size'];
+      $instance->lastModified = $data['updated'];
+      $instance->link         = $data['sharedLink'];
+      $instance->tags         = $data['tags'] ?? [];
+      $instance->namespace    = $data['namespace'];
+
+      return $instance;
   }
 
   public function getBody(): string
@@ -79,5 +101,4 @@ class FileRecord
 
     return $this->tags[$key];
   }
-
 }
