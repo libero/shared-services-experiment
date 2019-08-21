@@ -10,24 +10,17 @@ const example_thing = {
 
 const db_connection = require('../database');
 
-const { getFileMeta } = require('../controller');
+const { getFileMeta, uploadFile } = require('../controller');
 
 module.exports = {
   Query: {
-    getFileMeta: async (_, { id }, ___) => {
-      return await getFileMeta(db_connection, id);
+    getFileMeta: (_, { id }, ___) => {
+      return getFileMeta(db_connection, id);
     }
   },
   Mutation: {
-    uploadFile: async (_, {file} , ___) => {
-      const { stream, filename, mimetype, encoding } = await file;
-
-      // TODO: Validate the file metadata and stuff
-
-      // TODO: Pass the file into the thing
-
-      console.log("uploadFile");
-      return example_thing;
+    uploadFile: async (_, {file, meta} , ___) => {
+      return uploadFile(file, meta);
     }
   }
 };
