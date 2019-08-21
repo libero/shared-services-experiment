@@ -4,8 +4,8 @@ namespace Libero\SharedServicesExperiment\Client;
 
 use InvalidArgumentException;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\GuzzleException;
 use RuntimeException;
 
 use function GuzzleHttp\Psr7\stream_for;
@@ -64,10 +64,10 @@ class RestFileUploader implements FileUploader
                     'body' => $body
                 ]
             );
+        } catch (BadResponseException $e) {
+            throw new FileUploaderException('Error uploading file', $e->getCode(), $e);
         } catch (ConnectException $e) {
-            throw new RuntimeException('Network Error.' . $e->getMessage(), $e->getCode(), $e);
-        } catch (GuzzleException $e) {
-            throw new FileUploaderException('Error uploading file', $e->getCode());
+            throw new RuntimeException('Network Error. ' . $e->getMessage(), $e->getCode(), $e);
         }
 
         $status = $response->getStatusCode();

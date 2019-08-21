@@ -93,12 +93,12 @@ class RestFileUploaderTest extends TestCase
 
         $fileUploader = $this->makeMockFileUploader($mock);
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(FileUploaderException::class);
 
         $fileUploader->uploadFile(__DIR__ . '/stub.txt', '/foo/bar.txt');
     }
 
-    public function testUploadFileFailsWhenNetworkError()
+    public function testUploadFileFailsWhenNetworkErrorOccurs()
     {
         /** @var \GuzzleHttp\ClientInterface $mock */
         $mock = $this->createMock(ClientInterface::class);
@@ -108,12 +108,12 @@ class RestFileUploaderTest extends TestCase
 
         $mock->expects($this->once())
             ->method('request')
-            ->willThrowException(new ConnectException('server error', $requestMock));
+            ->willThrowException(new ConnectException('network failure', $requestMock));
 
         $fileUploader = new RestFileUploader($mock);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('server error');
+        $this->expectExceptionMessage('Network Error. network failure');
 
         $fileUploader->uploadFile(__DIR__ . '/stub.txt', '/foo/bar.txt');
     }
