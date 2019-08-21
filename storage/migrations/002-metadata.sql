@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS metadata (
   updated TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   size int not null,
   internalLink text,
-  sharedLink text,
   publicLink text,
   tags jsonb,
   mimeType text not null,

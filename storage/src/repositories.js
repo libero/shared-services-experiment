@@ -7,8 +7,9 @@ const fileMetaRepo = {
 }
 
 const fileDataRepo = {
-  get: (id) => fileDataRepository.getFile(id),
-  set: (fileStream, data) => fileDataRepository.getFile(fileStream, data),
+  getFile: (namespace, id) => fileDataRepository.getFile(namespace, id),
+  getSharedLink: (namespace, id) => fileDataRepository.getSharedLink(namespace, id),
+  putFile: (fileStream, data) => fileDataRepository.putFile(fileStream, data),
 }
 
 module.exports = {fileMetaRepo, fileDataRepo};
