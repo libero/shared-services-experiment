@@ -10,7 +10,7 @@ use RuntimeException;
 
 use function GuzzleHttp\Psr7\stream_for;
 
-class RestFileUploader implements FileUploader
+class RestFileUploader
 {
     /**
      * Http Client

@@ -6,11 +6,9 @@ use InvalidArgumentException;
 use Softonic\GraphQL\Client as GraphQLClient;
 use Softonic\GraphQL\ResponseBuilder;
 use GuzzleHttp\ClientInterface;
-use RuntimeException;
-
 use function GuzzleHttp\Psr7\stream_for;
 
-class GraphQLFileUploader implements FileUploader
+class GraphQLFileUploader
 {
     /**
      * GraphQL client instance
