@@ -36,7 +36,7 @@ class RestFileUploader implements FileUploader
      * @param string $uploadPath
      * @return FileUploadRecord
      * @throws InvalidArgumentException
-     * @throws FileUploaderException
+     * @throws FileUploadException
      */
     public function uploadFile(string $sourcePath, string $uploadPath): FileUploadRecord
     {
@@ -65,7 +65,7 @@ class RestFileUploader implements FileUploader
                 ]
             );
         } catch (BadResponseException $e) {
-            throw new FileUploaderException('Error uploading file', $e->getCode(), $e);
+            throw new FileUploadException('Error uploading file', $e->getCode(), $e);
         } catch (ConnectException $e) {
             throw new RuntimeException('Network Error. ' . $e->getMessage(), $e->getCode(), $e);
         }
@@ -73,7 +73,7 @@ class RestFileUploader implements FileUploader
         $status = $response->getStatusCode();
 
         if ($status !== 201) {
-            throw new FileUploaderException('Error uploading file', $status);
+            throw new FileUploadException('Error uploading file', $status);
         }
 
         return new FileUploadRecord(

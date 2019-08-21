@@ -8,7 +8,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Libero\SharedServicesExperiment\Client\RestFileUploader;
-use Libero\SharedServicesExperiment\Client\FileUploaderException;
+use Libero\SharedServicesExperiment\Client\FileUploadException;
 use Psr\Http\Message\RequestInterface;
 
 class RestFileUploaderTest extends TestCase
@@ -65,7 +65,7 @@ class RestFileUploaderTest extends TestCase
 
         $fileUploader = $this->makeMockFileUploader($mock);
 
-        $this->expectException(FileUploaderException::class);
+        $this->expectException(FileUploadException::class);
         $this->expectExceptionCode(500);
 
         $fileUploader->uploadFile(__DIR__ . '/stub.txt', '/foo/bar.txt');
@@ -79,7 +79,7 @@ class RestFileUploaderTest extends TestCase
 
         $fileUploader = $this->makeMockFileUploader($mock);
 
-        $this->expectException(FileUploaderException::class);
+        $this->expectException(FileUploadException::class);
         $this->expectExceptionCode(200);
 
         $fileUploader->uploadFile(__DIR__ . '/stub.txt', '/foo/bar.txt');
@@ -93,7 +93,7 @@ class RestFileUploaderTest extends TestCase
 
         $fileUploader = $this->makeMockFileUploader($mock);
 
-        $this->expectException(FileUploaderException::class);
+        $this->expectException(FileUploadException::class);
 
         $fileUploader->uploadFile(__DIR__ . '/stub.txt', '/foo/bar.txt');
     }

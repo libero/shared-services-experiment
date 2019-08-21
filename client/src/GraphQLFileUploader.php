@@ -70,7 +70,7 @@ QUERY;
             $response = $this->client->query($query, $queryVariables);
 
             if ($response->hasErrors()) {
-                throw new FileUploaderException(); // ?????
+                throw new FileUploadException(); // ?????
             }
         } catch (TransportException $e) {
             throw $e;

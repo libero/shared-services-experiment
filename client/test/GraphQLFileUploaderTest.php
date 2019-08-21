@@ -8,7 +8,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Libero\SharedServicesExperiment\Client\GraphQLFileUploader;
-use Libero\SharedServicesExperiment\Client\FileUploaderException;
+use Libero\SharedServicesExperiment\Client\FileUploadException;
 
 class GraphQLFileUploaderTest extends TestCase
 {
@@ -70,7 +70,7 @@ class GraphQLFileUploaderTest extends TestCase
 
         $fileUploader = $this->makeMockFileUploader($mock);
 
-        $this->expectException(FileUploaderException::class);
+        $this->expectException(FileUploadException::class);
 
         $fileUploader->uploadFile(__DIR__ . '/stub.txt', '/foo/bar.txt');
     }
