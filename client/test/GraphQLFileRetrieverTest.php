@@ -7,11 +7,11 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use Libero\SharedServicesExperiment\Client\RestFileRetriever;
+use Libero\SharedServicesExperiment\Client\GraphQLFileRetriever;
 use Libero\SharedServicesExperiment\Client\FileRetrievalException;
 use Psr\Http\Message\RequestInterface;
 
-class RestFileRetrieverTest extends TestCase
+class GraphQLFileRetrieverTest extends TestCase
 {
   // TODO: error when path is /files/file.ext (no namespace)
 
@@ -20,11 +20,12 @@ class RestFileRetrieverTest extends TestCase
         $handler = HandlerStack::create($mock);
         $client  = new Client(['handler' => $handler]);
 
-        return new RestFileRetriever($client);
+        return new GraphQLFileRetriever($client);
     }
 
     public function testRetrieveFileIsSuccessful()
     {
+        $fileMeta = [ 'data' => ['sharedLink' => 'http://some-link'] ];
         $bodyContent = 'The file contents';
         $mockHeaders = [
           'Content-Type' => 'application/pdf',
@@ -36,6 +37,7 @@ class RestFileRetrieverTest extends TestCase
         ];
 
         $mock = new MockHandler([
+            new Response(200, [], json_encode($fileMeta)),
             new Response(200, $mockHeaders, $bodyContent),
         ]);
 
@@ -56,54 +58,6 @@ class RestFileRetrieverTest extends TestCase
           ],
           $result->getTags()
         );
-    }
-
-    public function testRetrieveFileFailsWhenInvalidPath()
-    {
-        $mock = new MockHandler([
-            new Response(404)
-        ]);
-
-        $fileRetriever = $this->makeMockFileRetriever($mock);
-
-        $this->expectException(FileRetrievalException::class);
-        $this->expectExceptionMessage('Error retrieving file: some-path');
-
-        $fileRetriever->retrieveFile('some-path');
-    }
-
-    public function testRetrieveFileFailsWhenServerInternalErrorOccurs()
-    {
-        $mock = new MockHandler([
-            new Response(500)
-        ]);
-
-        $fileRetriever = $this->makeMockFileRetriever($mock);
-
-        $this->expectException(FileRetrievalException::class);
-        $this->expectExceptionMessage('Error retrieving file: some-path');
-
-        $fileRetriever->retrieveFile('some-path');
-    }
-
-    public function testUploadFileFailsWhenNetworkErrorOccurs()
-    {
-        /** @var \GuzzleHttp\ClientInterface $mock */
-        $mock = $this->createMock(ClientInterface::class);
-
-        /** @var \Psr\Http\Message\RequestInterface $requestMock */
-        $requestMock = $this->createMock(RequestInterface::class);
-
-        $mock->expects($this->once())
-            ->method('request')
-            ->willThrowException(new ConnectException('network failure', $requestMock));
-
-        $fileRetriever = new RestFileRetriever($mock);
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Network Error. network failure');
-
-        $fileRetriever->retrieveFile('some-path');
     }
 
 }
