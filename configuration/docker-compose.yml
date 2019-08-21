@@ -3,7 +3,7 @@ version: "3.4"
 services:
   etcd1:
     image: gcr.io/etcd-development/etcd:v3.3
-    restart: always
+    restart: unless-stopped
     healthcheck:
       test: "etcdctl endpoint health"
       interval: 1m
