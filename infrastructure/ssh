@@ -1,4 +1,6 @@
 #!/bin/bash
 set -e
 
+aws s3 cp s3://libero-terraform/shared-services-experiment/single-node--shared-services-experiment.key single-node--shared-services-experiment.key 
+chmod 600 *.key
 ssh -i single-node--shared-services-experiment.key "ubuntu@$(terraform output single_node_ip)"
