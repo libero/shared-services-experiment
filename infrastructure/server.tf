@@ -65,6 +65,14 @@ resource "aws_security_group" "single_node" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # MinIO storage service
+  ingress {
+    from_port = 9000
+    to_port = 9000
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port = 0
     to_port = 0
