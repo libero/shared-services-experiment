@@ -28,7 +28,7 @@ class GraphQLFileUploaderTest extends TestCase
             'mimeType'   => 'application/txt',
             'sharedLink' => 'http://user-facing-server/files/namespace/directory/file.ext',
             'namespace'  => 'namespace',
-            'path'       => 'directory/file.ext',
+            'key'        => 'directory/file.ext',
             'size'       => 12345,
             'updated'    => '2019-08-20 14:28:01.123456',
             'tags'       => [

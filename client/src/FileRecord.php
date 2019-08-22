@@ -7,13 +7,18 @@ use Psr\Http\Message\ResponseInterface;
 
 class FileRecord
 {
-
     private $body;
+
     private $contentType;
+
     private $etag;
+
     private $lastModified;
+
     private $link;
+
     private $size;
+
     private $tags = [];
 
     private function __construct()
@@ -56,7 +61,6 @@ class FileRecord
         $instance->lastModified = $data['updated'];
         $instance->link         = $data['sharedLink'];
         $instance->tags         = $data['tags'] ?? [];
-        $instance->namespace    = $data['namespace'];
 
         return $instance;
     }

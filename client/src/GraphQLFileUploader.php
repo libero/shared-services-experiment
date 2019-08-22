@@ -32,15 +32,15 @@ class GraphQLFileUploader
         $mimeType      = finfo_file($finfo, $sourcePath);
         $contentLength = filesize($sourcePath);
         $body          = stream_for(fopen($sourcePath, 'r'));
-        list(, $path)  = explode('/', $uploadPath, 2) + [1 => null];
+
+        list($namespace, $path) = explode('/', $uploadPath, 2) + [1 => null];
 
         $query = <<<'QUERY'
         mutation UploadFile(file: Upload, meta: FileMeta) {
             uploadFile {
-                id,
+                key,
                 updated,
                 size,
-                internalLink,
                 sharedLink,
                 publicLink,
                 tags,
@@ -55,8 +55,8 @@ QUERY;
             'meta' => [
                 'mimeType'  => $mimeType,
                 'size'      => $contentLength,
-                'namespace' => dirname($uploadPath),
-                'path'      => $path,
+                'namespace' => $namespace,
+                'key'       => $path,
                 'tags'      => [[
                     'key'   => 'filename',
                     'value' => basename($sourcePath)
