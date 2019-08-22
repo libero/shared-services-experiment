@@ -1,5 +1,5 @@
 // Controller (Use-cases)
-const { fileMetaRepo, fileDataRepo } = require('../repositories');
+const { fileMetaRepo, fileDataRepo } = require('./repositories');
 const { UserInputError } = require('apollo-server-express');
 
 // Get the file from S3
@@ -48,7 +48,7 @@ async function uploadFile(file, fileData) {
 
   // TODO: Pass the file into the thing
 
-  return fileMetaRepo.set(db_connection, newFile);;
+  return fileMetaRepo.set(db_connection, newFile);
 }
 
 function getFile(namespace, key) {

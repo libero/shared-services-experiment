@@ -13,11 +13,11 @@ const fileMetadataKnexRepository = {
 
   setMetadata: async (knex, data) => {
     // Check if there's anything on this key?
-    const fileEntry = fileMetadataKnexRepository.getMetadataByKey(knex, data.key);
+    const fileEntry = await fileMetadataKnexRepository.getMetadataByKey(knex, data.key);
 
     if (fileEntry) {
       // Use an existing one
-      return knex('metadata').where({id: fileEntry.id}).update(data);
+      return await knex('metadata').where({id: fileEntry.id}).update(data);
     } 
     // Create a new thing
     return await knex('metadata').insert(data);
