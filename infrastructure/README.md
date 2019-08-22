@@ -11,3 +11,9 @@ terraform apply
 ./ssh
 ```
 
+Everything is deployed from source:
+```
+cd ~/shared-service-experiment
+cd storage
+docker-compose ps
+```
