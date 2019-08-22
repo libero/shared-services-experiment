@@ -4,7 +4,6 @@ namespace Libero\SharedServicesExperiment\Client;
 
 use RuntimeException;
 
-class FileUploaderException extends RuntimeException
+class FileRetrievalException extends RuntimeException
 {
-
 }

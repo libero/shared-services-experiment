@@ -4,13 +4,13 @@ namespace Libero\SharedServicesExperiment\Client;
 
 use InvalidArgumentException;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\GuzzleException;
 use RuntimeException;
 
 use function GuzzleHttp\Psr7\stream_for;
 
-class RestFileUploader implements FileUploader
+class RestFileUploader
 {
     /**
      * Http Client
@@ -34,11 +34,11 @@ class RestFileUploader implements FileUploader
      *
      * @param string $sourcePath
      * @param string $uploadPath
-     * @return FileUploadRecord
+     * @return FileRecord
      * @throws InvalidArgumentException
-     * @throws FileUploaderException
+     * @throws FileUploadException
      */
-    public function uploadFile(string $sourcePath, string $uploadPath): FileUploadRecord
+    public function uploadFile(string $sourcePath, string $uploadPath): FileRecord
     {
         if (! file_exists($sourcePath)) {
             throw new InvalidArgumentException('File not found: ' . $sourcePath);
@@ -51,7 +51,7 @@ class RestFileUploader implements FileUploader
 
         try {
             $response = $this->client->request(
-            'PUT',
+                'PUT',
                 $uploadPath,
                 [
                     'headers' =>
@@ -64,22 +64,18 @@ class RestFileUploader implements FileUploader
                     'body' => $body
                 ]
             );
+        } catch (BadResponseException $e) {
+            throw new FileUploadException('Error uploading file', $e->getCode(), $e);
         } catch (ConnectException $e) {
-            throw new RuntimeException('Network Error.' . $e->getMessage(), $e->getCode(), $e);
-        } catch (GuzzleException $e) {
-            throw new FileUploaderException('Error uploading file', $e->getCode());
+            throw new RuntimeException('Network Error. ' . $e->getMessage(), $e->getCode(), $e);
         }
 
         $status = $response->getStatusCode();
 
         if ($status !== 201) {
-            throw new FileUploaderException('Error uploading file', $status);
+            throw new FileUploadException('Error uploading file', $status);
         }
 
-        return new FileUploadRecord(
-          $response->getHeader('Link')[0],
-          $response->getHeader('Last-Modified')[0],
-          $response->getHeader('ETag')[0]
-        );
+        return FileRecord::buildFromResponse($response);
     }
 }
