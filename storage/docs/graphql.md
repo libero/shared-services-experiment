@@ -1,6 +1,7 @@
 # GraphQL Api
 
-## /graphql endpoint
+## Data types
+
 
 ```
 type Tag {
@@ -8,38 +9,90 @@ type Tag {
   value: String!
 }
 
+input FileMetaInput {
+  key: String! # link from the service
+  namespace: String!
+  tags: [Tag]
+}
+
 type FileMeta {
-  id: ID!
+  key: String!
   updated: String!
   size: Int!
-  internalLink: String // link from the service
   sharedLink: String // signed url, generated when requested
   publicLink: String // accessbile to anyone if underlying storage publicly accessible
   tags: [Tag]
   mimeType: String!
   namespace: String!
 }
+```
 
-type Query {
-  getFileMeta(id: String): FileMeta!
-}
+## Uploading a file
 
+```
 type Mutation {
-  uploadFile(file: Upload, meta: FileMeta): FileMeta!
+  uploadFile(file: Upload, meta: FileMetaInput): FileMeta!
 }
 ```
 
-## /files endpoint
+To store a file with a namespace of ```libero``` and a key of ```directory/file.pdf```, the FileMetaInput structure
+should contain:
+
+```json
+{
+    "key": "directory/file.pdf",
+    "namespace": "libero"
+}
+```
+
+With tags, it becomes:
+
+```json
+{
+    "key": "directory/file.pdf",
+    "namespace": "libero",
+    "tags": [
+        {
+            "key": "original-filename",
+            "value": "original-file.pdf"
+        }
+    ]
+}
+```
+
+
+## Retrieving a file
+
+To retrieve a file, the following query is available:
 
 ```
-GET <provider url>
-
-Response:
-Code: 200
-Content-Type: application/pdf
-Content-Length: 12345
-Last-Modified: 2019-08-19T14:40:04.123456
-ETag: <etag>
-
-FILE DATA
+type Query {
+  getFileMeta(path: String): FileMeta!
+}
 ```
+
+To retrieve a file in the namespace ```libero``` and with key of ```directory/file.pdf```, the path input shoulde be:
+``` libero/directory/file.pdf ```
+
+The returned FileMeta should be:
+```json
+{
+    "key": "directory/file.pdf",
+    "updated": "2019-08-19T14:40:04.123456",
+    "size": 12345,
+    "publicLink": "http://storage-url/path/to/file>",
+    "signedLink": "http://storage-url/path/to/file?token=abcdef>",
+    "namespace": "libero",
+    "mimeType": "application/pdf",
+    "tags": [
+        {
+            "key": "original-filename",
+            "value": "original-file.pdf"
+        }
+    ]
+}
+```
+
+The file can then be downloaded either through the ```signedLink``` or ```publicLink``` via an HTTP request.
+
+
