@@ -1,0 +1,10 @@
+version: "3.4"
+
+services:
+  side-configuration:
+    image: side-configuration
+    restart: always
+    environment:
+      CONFIG_URL: ${CONFIG_URL}
+    volumes:
+      - /etc/configuration

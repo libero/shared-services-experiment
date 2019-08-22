@@ -1,0 +1,15 @@
+{
+  "name": "side-configuration",
+  "version": "1.0.0",
+  "description": "A generic side-car for caching configutation for a service.",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "etcd3": "^0.2.13",
+    "lodash": "^4.17.15"
+  }
+}
