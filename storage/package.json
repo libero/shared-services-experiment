@@ -1,0 +1,24 @@
+{
+  "name": "storage-service",
+  "version": "1.0.0",
+  "description": "Shared service for storing and retrieving files and metadata",
+  "main": "src/index.js",
+  "repository": {
+    "url": "https://github.com/libero/shared-services-experiment",
+    "type": "git"
+  },
+  "license": "MIT",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "apollo-server-express": "^2.8.1",
+    "aws-sdk": "^2.513.0",
+    "connect-busboy": "^0.0.2",
+    "express": "^4.17.1",
+    "funfix": "^7.0.1",
+    "graphql": "^14.4.2",
+    "knex": "^0.19.2",
+    "pg": "^7.12.1"
+  }
+}

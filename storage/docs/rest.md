@@ -18,7 +18,7 @@ ETag: <etag>
 ## Get a file
 
 ```
-GET /files/foo/bar.pdf
+GET /files/namespace/directory/file.ext
 #Prefer: original
 
 Response:
@@ -50,6 +50,7 @@ ETag: <etag>
 ```
 
 ## Get file directly
+> What is this?
 
 ```
 GET http://url/foo/bar.pdf
