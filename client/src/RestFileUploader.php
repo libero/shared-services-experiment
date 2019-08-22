@@ -51,7 +51,7 @@ class RestFileUploader
 
         try {
             $response = $this->client->request(
-            'PUT',
+                'PUT',
                 $uploadPath,
                 [
                     'headers' =>

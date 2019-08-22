@@ -48,6 +48,49 @@ class RestFileUploaderTest extends TestCase
         $this->assertEquals($mockHeaders['ETag'], $result->getETag());
     }
 
+    public function testUploadFileSendsCorrectRequest()
+    {
+        $sourcePath = __DIR__ . '/stub.txt';
+        $uploadPath = '/namespace/directory/foo.txt';
+        $fileSize   = filesize($sourcePath);
+        $body       = fread(fopen($sourcePath, 'r'), filesize($sourcePath));
+
+        /** @var \GuzzleHttp\ClientInterface $mock */
+        $mock = $this->createMock(ClientInterface::class);
+
+        $response = new Response(201, [
+            'Link'           => 'http://user-facing-server/files/namespace/directory/file.ext',
+            'Last-Modified'  => '2019-08-20 14:28:01.123456',
+            'ETag'           => 'someHashOrOtherForETag',
+            'Content-Type'   => 'application/text',
+            'Content-Length' => 12345
+        ]);
+
+        $mock->expects($this->once())
+            ->method('request')
+            ->with(
+                'PUT',
+                $uploadPath,
+                $this->callback(function ($options) use ($fileSize, $body) {
+                    return empty(array_diff($options['headers'],
+                        [
+                            'Content-Type'     => 'text/plain',
+                            'Content-Length'   => $fileSize,
+                            'Libero-file-tags' => 'filename=stub.txt',
+                            'If-Match'         => '*'
+                        ]
+                    ))
+                    && $options['body'] instanceof GuzzleHttp\Psr7\Stream
+                    && $options['body']->getContents() === $body;
+                })
+            )
+            ->will($this->returnValue($response));
+
+        $fileUploader = new RestFileUploader($mock);
+
+        $fileUploader->uploadFile($sourcePath, $uploadPath);
+    }
+
     public function testUploadFileFailsWhenFileDoesntExist()
     {
         $mock = new MockHandler([

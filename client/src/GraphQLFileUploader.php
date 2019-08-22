@@ -28,6 +28,9 @@ class GraphQLFileUploader
             throw new InvalidArgumentException('File not found: ' . $sourcePath);
         }
 
+        // normalise upload path
+        $uploadPath = substr($uploadPath, 0, 1) === '/' ? substr($uploadPath, 1) : $uploadPath;
+
         $finfo         = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType      = finfo_file($finfo, $sourcePath);
         $contentLength = filesize($sourcePath);
