@@ -3,12 +3,12 @@ const { fileMetaRepo, fileDataRepo } = require('./repositories');
 const { UserInputError } = require('apollo-server-express');
 
 // Get the file from S3
-async function getFileMeta(db_connection, key) {
-  const out = await fileMetaRepo.get(db_connection, key);
+async function getFileMeta(db_connection, namespace, key) {
+  const out = await fileMetaRepo.get(db_connection, namespace, key);
   return out.getOrElseL(() => {throw new UserInputError("file not found")});
 }
 
-async function uploadFile(file, fileData) {
+async function uploadFile(db_connection, file, fileData) {
   const { stream, filename, mimetype, encoding } = await file;
 
   let fileSize = 0;
@@ -16,6 +16,7 @@ async function uploadFile(file, fileData) {
   const fileContent = await new Promise((resolve, reject) => {
     const chunks = [];
     stream.on('data', chunk => {
+      console.log(chunk.length);
       fileSize += chunk.length;
       chunks.push(chunk);
     });
@@ -29,7 +30,7 @@ async function uploadFile(file, fileData) {
   })
 
   // store file
-  await fileDataRepo.putFile(fileContent, fileData);
+  await fileDataRepo.putFile(fileContent, fileData).catch((e) => console.error(e));
 
   // store meta
   const newFile = {
@@ -51,9 +52,10 @@ async function uploadFile(file, fileData) {
   return fileMetaRepo.set(db_connection, newFile);
 }
 
-function getFile(namespace, key) {
-  // Returns a file stream
-  return fileDataRepo.getFile(namespace, key);
+async function getFile(db_connection, namespace, key) {
+  const fdata = await fileDataRepo.getFile(namespace, key);
+
+  return {file: fdata.Body, meta: await getFileMeta(db_connection, key)};
 }
 
 function getSharedLink(fileMeta) {

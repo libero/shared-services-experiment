@@ -14,11 +14,11 @@
   "dependencies": {
     "apollo-server-express": "^2.8.1",
     "aws-sdk": "^2.513.0",
-    "connect-busboy": "^0.0.2",
     "express": "^4.17.1",
     "funfix": "^7.0.1",
     "graphql": "^14.4.2",
     "knex": "^0.19.2",
-    "pg": "^7.12.1"
+    "pg": "^7.12.1",
+    "through": "^2.3.8"
   }
 }

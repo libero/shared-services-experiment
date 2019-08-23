@@ -31,7 +31,7 @@ input TagInput {
 }
 
 type Query {
-  getFileMeta(key: String): FileMeta
+  getFileMeta(namespace: String!, key: String!): FileMeta
 }
 
 type Mutation {

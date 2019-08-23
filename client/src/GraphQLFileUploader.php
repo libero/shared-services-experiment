@@ -6,11 +6,9 @@ use InvalidArgumentException;
 use Softonic\GraphQL\Client as GraphQLClient;
 use Softonic\GraphQL\ResponseBuilder;
 use GuzzleHttp\ClientInterface;
-use RuntimeException;
-
 use function GuzzleHttp\Psr7\stream_for;
 
-class GraphQLFileUploader implements FileUploader
+class GraphQLFileUploader
 {
     /**
      * GraphQL client instance
@@ -24,25 +22,28 @@ class GraphQLFileUploader implements FileUploader
         $this->client = new GraphQLClient($client, new ResponseBuilder());
     }
 
-    public function uploadFile(string $sourcePath, string $uploadPath): FileUploadRecord
+    public function uploadFile(string $sourcePath, string $uploadPath): FileRecord
     {
         if (! file_exists($sourcePath)) {
             throw new InvalidArgumentException('File not found: ' . $sourcePath);
         }
 
+        // normalise upload path
+        $uploadPath = substr($uploadPath, 0, 1) === '/' ? substr($uploadPath, 1) : $uploadPath;
+
         $finfo         = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType      = finfo_file($finfo, $sourcePath);
         $contentLength = filesize($sourcePath);
         $body          = stream_for(fopen($sourcePath, 'r'));
-        list(, $path)  = explode('/', $uploadPath, 2) + [1 => null];
+
+        list($namespace, $path) = explode('/', $uploadPath, 2) + [1 => null];
 
         $query = <<<'QUERY'
         mutation UploadFile(file: Upload, meta: FileMeta) {
             uploadFile {
-                id,
+                key,
                 updated,
                 size,
-                internalLink,
                 sharedLink,
                 publicLink,
                 tags,
@@ -57,8 +58,8 @@ QUERY;
             'meta' => [
                 'mimeType'  => $mimeType,
                 'size'      => $contentLength,
-                'namespace' => dirname($uploadPath),
-                'path'      => $path,
+                'namespace' => $namespace,
+                'key'       => $path,
                 'tags'      => [[
                     'key'   => 'filename',
                     'value' => basename($sourcePath)
@@ -70,7 +71,7 @@ QUERY;
             $response = $this->client->query($query, $queryVariables);
 
             if ($response->hasErrors()) {
-                throw new FileUploaderException(); // ?????
+                throw new FileUploadException(); // ?????
             }
         } catch (TransportException $e) {
             throw $e;
@@ -78,6 +79,6 @@ QUERY;
 
         $data = $response->getData();
 
-        return new FileUploadRecord($data['internalLink'], $data['updated'], '');
+        return FileRecord::buildFromData($data);
     }
 }
