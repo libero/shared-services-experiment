@@ -31,7 +31,7 @@ The Server should respond with:
 
 ```http
 Code: 201
-Link: "<http://storage-url/path/to/file>;rel=public"
+Link: "<http://storage-url/path/to/file>;rel=https://libero.pub/public"
 Last-Modified: 2019-08-19T14:40:04.123456
 Libero-file-id: bd1c9a15-bc18-4151-a4eb-9f45cedb9700
 ETag: <etag>
