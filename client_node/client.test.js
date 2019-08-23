@@ -12,19 +12,21 @@ describe('client tests', () => {
 
         it('should upload a file', async () => {
             let client = new restClient('http://localhost:3000');
-            expect(await client.uploadFile(
+            const response = await client.uploadFile(
                 'test',
                 'somedir',
                 'testFile.bar',
-                createReadStream('testFile.txt'),
+                'text and stuff',
                 'application/text',
                 'sometag=somevalue',
-            )).not.toThrow();
+            );
+            console.log(response);
+            expect(response).not.toBeUndefined()
         });
 
         it('should retrieve a file', async () => {
             let client = new restClient('http://localhost:3000');
-            const {file} = await client.uploadFile(
+            await client.uploadFile(
                 'test',
                 'somedir',
                 'testFile.bar',
@@ -32,6 +34,8 @@ describe('client tests', () => {
                 'application/text',
                 'sometag=somevalue',
             );
+
+            const { file } = await client.fetchFile('test', 'somedir', 'testFile.bar');
             expect(file.length).toBeGreaterThan(0);
         });
 
@@ -62,13 +66,12 @@ describe('client tests', () => {
             let client = new graphqlClient('http://localhost:3000/graphql/');
             expect(client).toHaveProperty('getFileMetaData');
             expect(client).toHaveProperty('uploadFile');
+            expect(client).toHaveProperty('fetchFile');
         });
 
         it('should upload a file', async () => {
             let client = new graphqlClient('http://localhost:3000/graphql/');
-            let file;
-            await client.uploadFile('test', 'somedir', 'testFile.bar', createReadStream('testFile.txt'), 'sometag=somevalue').then(result => file = result);
-            expect(file.length).toBeGreaterThan(0);
+            expect(await client.uploadFile('test', 'somedir', 'testFile.bar', createReadStream('testFile.txt'), 'sometag=somevalue')).not.toThrow();
         });
 
         it('should retrieve a file', async () => {

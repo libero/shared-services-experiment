@@ -10,8 +10,8 @@ const restClient = function(url) {
             headers = { ...headers, "Libero-file-tags": metaData}
         }
         try {
-            const response = await fetch(`${url}/files/${namespace}/${directory}/${filename}`, {
-                method: 'POST',
+            const response = await fetch(`${url}/rest/files/${namespace}/${directory}/${filename}`, {
+                method: 'PUT',
                 body: file,
                 headers: headers
             });
@@ -25,7 +25,7 @@ const restClient = function(url) {
 
     const fetchFile = async function (namespace, directory, filename) {
         try {
-            const response = await fetch(`${url}/files/${namespace}/${directory}/${filename}`);
+            const response = await fetch(`${url}/rest/files/${namespace}/${directory}/${filename}`);
             const tags = response.headers.get('Libero-file-tags');
             const link = response.headers.get('Link');
             const lastModified = response.headers.get('Last-Modified');
@@ -47,7 +47,7 @@ const restClient = function(url) {
 
     const fetchMetaData = async function (namespace, directory, filename) {
         try {
-            const response = await fetch(`${url}/files/${namespace}/${directory}/${filename}`, {
+            const response = await fetch(`${url}/rest/files/${namespace}/${directory}/${filename}`, {
                 method: 'HEAD'
             });
             const tags = response.headers.get('Libero-file-tags');
