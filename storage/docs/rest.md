@@ -18,18 +18,18 @@ The key is unique within the namespace and provides a mapping between the storag
 To store a file with a namespace of ```libero``` and a key of ```directory/file.pdf```, the following request should be
 used
 
-```
+```http
 PUT /files/libero/directory/file.pdf
 
 Content-Type: application/pdf
+Content-Length: 12345
 If-Match: <etag_value>|*
 Libero-file-tags: "filename=original-file.pdf,key1=value=1"
 ```
 
 The Server should respond with:
 
-```
-Response:
+```http
 Code: 201
 Link: "<http://storage-url/path/to/file>;rel=public"
 Last-Modified: 2019-08-19T14:40:04.123456
@@ -49,12 +49,12 @@ same URL, a new value for ```Libero-file-id``` should be returned.
 
 To retrieve a file in the namespace ```libero``` and with key of ```directory/file.pdf```:
 
-```
+```http
 GET /files/libero/directory/file.pdf
 ```
 
 Response:
-```
+```http
 Code: 200
 Content-Type: application/pdf
 Content-Length: 12345
@@ -75,13 +75,13 @@ The returned Link header value is the public url if the underlying storage is pu
 
 To retrieve the metadata of a file in the namespace ```libero``` and with key of ```directory/file.pdf```:
 
-```
+```http
 HEAD /files/libero/directory/file.pdf
 ```
 
 The response should be:
 
-```
+```http
 Code: 200
 Content-Type: application/pdf
 Content-Length: 12345
@@ -99,13 +99,13 @@ The Link value is a direct url to the stored file.
 
 If the underlying storage is private, then the following request should be used
 
-```
+```http
 HEAD /files/libero/directory/file.pdf
 Prefer: link=signed
 ```
 
 The following response should be returned
-```
+```http
 Code: 200
 Content-Type: application/pdf
 Content-Length: 12345
