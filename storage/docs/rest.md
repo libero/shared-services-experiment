@@ -11,6 +11,8 @@ or more directories e.g:
 * ``` /files/libero/foo.txt ```
 * ``` /files/libero/baz/bar/foo.txt ```
 
+The key is unique within the namespace and provides a mapping between the storage entity and the provider entity (e.g. S3).
+
 ## Storing a file
 
 To store a file with a namespace of ```libero``` and a key of ```directory/file.pdf```, the following request should be
@@ -31,26 +33,29 @@ Response:
 Code: 201
 Link: "<http://storage-url/path/to/file>;rel=public"
 Last-Modified: 2019-08-19T14:40:04.123456
+Libero-file-id: bd1c9a15-bc18-4151-a4eb-9f45cedb9700
 ETag: <etag>
 ```
 
 When uploading for the first time, the ```If-Match``` header should be set to '*'. If the ```If-Match``` fails,
 then a 412 (Precondition Failed) should be returned.
 
-## Get a file
+The ```Libero-file-id``` value is a reference to the storage entity's internal id for a file. When uploading to the
+same URL, a new value for ```Libero-file-id``` should be returned.
 
+## Retrieving a file
 
 To retrieve a file in the namespace ```libero``` and with key of ```directory/file.pdf```:
 
 ```
 GET /files/libero/directory/file.pdf
-#Prefer: original
 
 Response:
 Code: 200
 Content-Type: application/pdf
 Content-Length: 12345
 Libero-file-tags: "filename=original-file.pdf,key1=value=1"
+Libero-file-id: bd1c9a15-bc18-4151-a4eb-9f45cedb9700
 Link: "<http://storage-url/path/to/file>;rel=public"
 Last-Modified: 2019-08-19T14:40:04.123456
 ETag: <etag>
@@ -60,24 +65,53 @@ FILE DATA
 
 The returned Link header value is the public url if the underlying storage is public.
 
+## Retrieving a file meta data
 
-## Get file meta data
+### Public storage
 
 To retrieve the metadata of a file in the namespace ```libero``` and with key of ```directory/file.pdf```:
 
 ```
-HEAD /files/namespace/directory/file.pdf
+HEAD /files/libero/directory/file.pdf
+```
 
-Response:
+The response should be:
+
+```
 Code: 200
 Content-Type: application/pdf
 Content-Length: 12345
 Libero-file-tags: "filename=original-file.pdf,key1=value=1"
+Libero-file-id: bd1c9a15-bc18-4151-a4eb-9f45cedb9700
 Link: "<http://storage-url/path/to/file>;rel=public"
+Last-Modified: 2019-08-19T14:40:04.123456
+ETag: <etag>
+```
+
+The Link value is a direct url to the stored file.
+
+### Private storage
+
+If the underlying storage is private, then the following request should be used
+
+```
+HEAD /files/libero/directory/file.pdf
+Libero-url-type: signed
+```
+
+The following response should be returned
+```
+Code: 200
+Content-Type: application/pdf
+Content-Length: 12345
+Libero-file-tags: "filename=original-file.pdf,key1=value=1"
+Libero-file-id: bd1c9a15-bc18-4151-a4eb-9f45cedb9700
 Link: "<http://storage-url/path/to/file?token=abcdef>;rel=signed"
 Last-Modified: 2019-08-19T14:40:04.123456
 ETag: <etag>
 ```
 
-An additional signed Link header that is the signed version of the url if the underlying storage is not
-public. If the underlying storage is public then the signed url will be the same as the public one.
+The Link value should be a signed url that can subsquently be used to access the file directly from
+the private storage entity.
+
+Note that if the ```Libero-url-type``` header is not sent then no Link header should be returned in the response.

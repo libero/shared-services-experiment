@@ -2,7 +2,6 @@
 
 ## Data types
 
-
 ```
 type Tag {
   key: String!
@@ -16,6 +15,7 @@ input FileMetaInput {
 }
 
 type FileMeta {
+  id: ID!
   key: String!
   updated: String!
   size: Int!
@@ -29,9 +29,18 @@ type FileMeta {
 
 ## Uploading a file
 
+The query:
 ```
-type Mutation {
-  uploadFile(file: Upload, meta: FileMetaInput): FileMeta!
+mutation UploadFile($file: Upload, $meta: FileMeta) {
+   uploadFile(file: $file, meta: $meta) {
+        key,
+        updated,
+        size,
+        publicLink,
+        tags,
+        mimeType,
+        namespace
+    }
 }
 ```
 
@@ -63,11 +72,18 @@ With tags, it becomes:
 
 ## Retrieving a file
 
-To retrieve a file, the following query is available:
+### Public storage
 
 ```
-type Query {
-  getFileMeta(path: String): FileMeta!
+query GetFileMeta($key: String) {
+    getFileMeta(key: $key) {
+        updated,
+        size,
+        publicLink,
+        tags,
+        mimeType,
+        namespace
+    }
 }
 ```
 
@@ -77,11 +93,11 @@ To retrieve a file in the namespace ```libero``` and with key of ```directory/fi
 The returned FileMeta should be:
 ```json
 {
+    "id": "bd1c9a15-bc18-4151-a4eb-9f45cedb9700",
     "key": "directory/file.pdf",
     "updated": "2019-08-19T14:40:04.123456",
     "size": 12345,
-    "publicLink": "http://storage-url/path/to/file>",
-    "signedLink": "http://storage-url/path/to/file?token=abcdef>",
+    "publicLink": "http://storage-url/path/to/file",
     "namespace": "libero",
     "mimeType": "application/pdf",
     "tags": [
@@ -93,6 +109,37 @@ The returned FileMeta should be:
 }
 ```
 
+By default, the ```signedLink``` member is not returned (see below).
+
+
+### Retrieving a signed link
+
+You need to specify signedLink in your graphql request
+
+```
+query GetFileMeta($key: String) {
+    getFileMeta(key: $key) {
+        signedLink
+        // other fields if needed
+    }
+}
+```
+
+Response should be:
+
+```
+{
+    "signedLink": "http://storage-url/path/to/file?token=abcdef",
+}
+```
+
+If the underlying storage is public then an erro should be returned:
+```
+{
+    "error": "Storage is public"
+}
+```
+
+### Fetching the file
+
 The file can then be downloaded either through the ```signedLink``` or ```publicLink``` via an HTTP request.
-
-
