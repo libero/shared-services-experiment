@@ -13,7 +13,13 @@ const fileMetadataKnexRepository = {
 
   setMetadata: async (knex, data) => {
     // Check if there's anything on this key?
-    const fileEntry = await fileMetadataKnexRepository.getMetadataByKey(knex, data.key);
+    console.log({data});
+
+    // ew gross
+    data.tags = {tags: data.tags}
+
+    const fileEntry = (await fileMetadataKnexRepository.getMetadataByKey(knex, data.key)).orUndefined();
+
 
     if (fileEntry) {
       // Use an existing one

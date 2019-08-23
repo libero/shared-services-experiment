@@ -9,7 +9,7 @@ const CONFIG = {
       region: process.env.AWS_REGION || ''
     },
     S3_BUCKET: 'storage-service-demo',
-    S3_ACL: 'public'
+    S3_ACL: 'public-read'
   }
 }
 
@@ -29,7 +29,8 @@ const putFile = (fStream, fData) => {
       Bucket: CONFIG[fData.namespace].S3_BUCKET,
       Key: fData.key,
       ContentType: fData.mimeType,
-      ContentLength: fData.size,
+      // ContentLength is set automatically by `aws-sdk`, setting is manually will break stuff
+      // ContentLength: fData.size,
       ACL: CONFIG[fData.namespace].S3_ACL,
     })
     .promise()
@@ -37,7 +38,7 @@ const putFile = (fStream, fData) => {
 
 const getFile = (namespace, key) => {
   const s3 = getS3Instance(CONFIG[namespace].AWS_CREDENTIALS);
-  return s3.getObject({ Bucket: CONFIG[namespace].S3_BUCKET, Key: key })
+  return s3.getObject({ Bucket: CONFIG[namespace].S3_BUCKET, Key: key }).promise();
 }
 
 const getSharedLink = (namespace, key) => {
