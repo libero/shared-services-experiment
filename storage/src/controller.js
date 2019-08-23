@@ -3,8 +3,8 @@ const { fileMetaRepo, fileDataRepo } = require('./repositories');
 const { UserInputError } = require('apollo-server-express');
 
 // Get the file from S3
-async function getFileMeta(db_connection, key) {
-  const out = await fileMetaRepo.get(db_connection, key);
+async function getFileMeta(db_connection, namespace, key) {
+  const out = await fileMetaRepo.get(db_connection, namespace, key);
   return out.getOrElseL(() => {throw new UserInputError("file not found")});
 }
 

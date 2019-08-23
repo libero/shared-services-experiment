@@ -2,7 +2,7 @@ const fileMetadataKnexRepository = require('./database/file_metadata');
 const fileDataRepository = require('./s3Repository')
 
 const fileMetaRepo = {
-  get: (knex, key) => fileMetadataKnexRepository.getMetadataByKey(knex, key),
+  get: (knex, namespace, key) => fileMetadataKnexRepository.getMetadataByKey(knex, namespace, key),
   set: (knex, data) => fileMetadataKnexRepository.setMetadata(knex, data),
 }
 

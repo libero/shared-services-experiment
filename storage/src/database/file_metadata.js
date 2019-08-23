@@ -1,10 +1,11 @@
 const { Option, None } = require("funfix");
 
 const fileMetadataKnexRepository = {
-  getMetadataByKey: async (knex, key) => {
+  getMetadataByKey: async (knex, namespace, key) => {
     const result = Option.of(
       (await knex("metadata").where({
-        key
+        key,
+        namespace
       }))[0]
     );
 
