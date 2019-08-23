@@ -16,6 +16,7 @@ const graphqlClient = function(url) {
     });
 
     const getFileMetaData = async function(key) {
+        let metaData;
         await client.query({
             query: gql`
                 query GetMetaData($key: String!) {
@@ -27,7 +28,9 @@ const graphqlClient = function(url) {
             variables: {
                 key: key,
             }
-        })
+        }).then(result => metaData = result);
+
+        return metaData;
     };
 
     const uploadFile = async function (namespace, directory, filename, file, tags) {
@@ -35,7 +38,8 @@ const graphqlClient = function(url) {
             key: `${directory}/${filename}`,
             namespace: namespace,
         };
-        console.log(JSON.stringify(fileMetaInput, null, 4));
+        let metaData;
+
         let mutation = gql`
             mutation UploadFile($file: Upload!, $meta: FileMeta!) {
                 uploadFile(file: $file, meta: $meta) {
@@ -51,30 +55,19 @@ const graphqlClient = function(url) {
                 }
             }
         `;
-        // console.log(mutation);
+
         await client.mutate({
             variable: {
                 file: file,
                 meta: fileMetaInput,
             },
             mutation: mutation
-        });
-        console.log('mutated')
+        }).then(result => metaData = result);
+
+        return metaData;
     };
 
     return { uploadFile, getFileMetaData }
 };
 
 module.exports = graphqlClient;
-
-
-// type FileMeta {
-//     key: String!
-//     updated: String!
-//     size: Int!
-//     sharedLink: String
-//     publicLink: String
-//     tags: [Tag]
-//     mimeType: String!
-//     namespace: String!
-// }

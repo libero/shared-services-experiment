@@ -8,7 +8,9 @@
   },
   "author": "",
   "license": "ISC",
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^24.9.0"
+  },
   "dependencies": {
     "apollo-cache-inmemory": "^1.6.3",
     "apollo-client": "^2.6.4",
