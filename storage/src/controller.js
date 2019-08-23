@@ -52,10 +52,10 @@ async function uploadFile(db_connection, file, fileData) {
   return fileMetaRepo.set(db_connection, newFile);
 }
 
-async function getFile(namespace, key) {
-  // Returns a file stream
-  console.log("fetfile");
-  const fdata = fileDataRepo.getFile(namespace, key);
+async function getFile(db_connection, namespace, key) {
+  const fdata = await fileDataRepo.getFile(namespace, key);
+
+  return {file: fdata.Body, meta: await getFileMeta(db_connection, key)};
 }
 
 function getSharedLink(fileMeta) {

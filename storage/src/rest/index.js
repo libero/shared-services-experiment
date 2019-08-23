@@ -10,14 +10,25 @@ const make_composite_key = (a, b, c) => a + b + c;
 
 router
   .route("/files/:namespace/:directory/:file")
-  .get((req, res) => {
+  .get( async (req, res) => {
     const { namespace, directory, file } = req.params;
 
-    const fdata = controller.getFile(namespace, `${directory}/${file}`);
+    const {file: fdata, meta }= await controller.getFile(db_connection, namespace, `${directory}/${file}`);
 
-    console.log(fdata);
+    res
+      .status(200)
+      .append("Content-Type", meta.mimetype)
+      .append("Content-Length", meta.size)
+      .append("Libero-file-tags", "a=b,c=d")
+      .append("Libero-file-id", meta.id)
+      .append("Link", `${meta.sharedlink} rel=shared`)
+      .append("Link", `${meta.publiclink} rel=public`)
+      .append("Last-Modified", meta.updated)
+      // Because you can't modify a file once it's PUT, we're using the file id as it's etag
+      .append("Etag", meta.id)
+      .send(fdata);
 
-    res.json({ ok: false });
+
   })
   .put(async (req, res) => {
     const { namespace, directory, file } = req.params;
@@ -33,17 +44,8 @@ router
       }
     );
 
-    // req
-    // .on("data", data => {
-    // dataStream.write(data);
-    // })
-    // .on("end", () => {
-    // dataStream.end();
-    // console.log("ended");
-    // });
-
     const streamData = {
-      // TODO: We need to get this information from the incoming stream
+      // The `req` object can be used as a stream
       stream: req,
       filename: key,
       mimetype: req.headers['content-type'],
@@ -59,9 +61,9 @@ router
       namespace
     };
 
-    const result = await controller.uploadFile(db_connection, streamData, meta);
+    const result = await controller.uploadFile(db_connection, streamData, meta).then(() => true).catch(() => false);
 
-    res.json({ ok: true });
+    res.json({ ok: result });
   })
   .head(async (req, res) => {
     const { namespace, directory, file } = req.params;
