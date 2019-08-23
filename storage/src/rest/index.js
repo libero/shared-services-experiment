@@ -17,7 +17,7 @@ router
 
     res
       .status(200)
-      .append("Content-Type", meta.mimetype)
+      .append("Content-Type", meta.mimeType)
       .append("Content-Length", meta.size)
       .append("Libero-file-tags", "a=b,c=d")
       .append("Libero-file-id", meta.id)
