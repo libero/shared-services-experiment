@@ -10,6 +10,12 @@ const apollo = new ApolloServer({ typeDefs, resolvers });
 const db = require('./database');
 
 const app = express();
+
+app.use((req, _, next) => {
+  console.log(req.method, req.path);
+
+  next();
+});
 apollo.applyMiddleware({app});
 
 const port = process.env.PORT || 3000
