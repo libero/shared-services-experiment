@@ -33,7 +33,6 @@ The Server should respond with:
 Code: 201
 Link: "<http://storage-url/path/to/file>;rel=https://libero.pub/public"
 Last-Modified: 2019-08-19T14:40:04.123456
-Libero-file-id: bd1c9a15-bc18-4151-a4eb-9f45cedb9700
 ETag: <etag>
 ```
 
@@ -41,9 +40,6 @@ When uploading for the first time, the ```If-Match``` header should be set to '*
 then a 412 (Precondition Failed) should be returned.
 
 If a there is no ```If-Match``` sent, then the storage service should send back a 428 (Precondition Required).
-
-The ```Libero-file-id``` value is a reference to the storage entity's internal id for a file. When uploading to the
-same URL, a new value for ```Libero-file-id``` should be returned.
 
 ## Retrieving a file
 
@@ -59,7 +55,6 @@ Code: 200
 Content-Type: application/pdf
 Content-Length: 12345
 Libero-file-tags: "filename=original-file.pdf,key1=value=1"
-Libero-file-id: bd1c9a15-bc18-4151-a4eb-9f45cedb9700
 Link: "<http://storage-url/path/to/file>;rel=https://libero.pub/public"
 Last-Modified: 2019-08-19T14:40:04.123456
 ETag: <etag>
@@ -86,7 +81,6 @@ Code: 200
 Content-Type: application/pdf
 Content-Length: 12345
 Libero-file-tags: "filename=original-file.pdf,key1=value=1"
-Libero-file-id: bd1c9a15-bc18-4151-a4eb-9f45cedb9700
 Link: "<http://storage-url/path/to/file>;rel=https://libero.pub/public"
 Last-Modified: 2019-08-19T14:40:04.123456
 ETag: <etag>
@@ -110,7 +104,6 @@ Code: 200
 Content-Type: application/pdf
 Content-Length: 12345
 Libero-file-tags: "filename=original-file.pdf,key1=value=1"
-Libero-file-id: bd1c9a15-bc18-4151-a4eb-9f45cedb9700
 Link: "<http://storage-url/path/to/file?token=abcdef>;rel=https://libero.pub/signed"
 Last-Modified: 2019-08-19T14:40:04.123456
 ETag: <etag>

@@ -15,7 +15,6 @@ input FileMetaInput {
 }
 
 type FileMeta {
-  id: ID!
   key: String!
   updated: String!
   size: Int!
@@ -93,7 +92,6 @@ To retrieve a file in the namespace ```libero``` and with key of ```directory/fi
 The returned FileMeta should be:
 ```json
 {
-    "id": "bd1c9a15-bc18-4151-a4eb-9f45cedb9700",
     "key": "directory/file.pdf",
     "updated": "2019-08-19T14:40:04.123456",
     "size": 12345,
