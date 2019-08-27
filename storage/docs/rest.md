@@ -6,7 +6,7 @@ The REST Api uses the following scheme for urls
 
 ``` /files/<namespace>/<key> ```
 
-The '<namespace>' component cannot include the the '/' character, while the '<key>' can include zero
+The `<namespace>` component cannot include the the `/` character, while the `<key>` can include zero
 or more directories e.g:
 * ``` /files/libero/foo.txt ```
 * ``` /files/libero/baz/bar/foo.txt ```
@@ -36,7 +36,7 @@ Last-Modified: 2019-08-19T14:40:04.123456
 ETag: <etag>
 ```
 
-When uploading for the first time, the ```If-Match``` header should be set to '*'. If the ```If-Match``` fails,
+When uploading for the first time, the ```If-Match``` header should be set to `*`. If the ```If-Match``` fails,
 then a 412 (Precondition Failed) should be returned.
 
 If a there is no ```If-Match``` sent, then the storage service should send back a 428 (Precondition Required).
@@ -64,7 +64,7 @@ FILE DATA
 
 The returned Link header value is the public url if the underlying storage is public.
 
-## Retrieving a file meta data
+## Retrieving a file's meta data
 
 ### Public storage
 
@@ -114,5 +114,5 @@ Preference-Applied: link=signed
 The Link value should be a signed url that can subsquently be used to access the file directly from
 the private storage entity.
 
-Note that if the ```Prefer`` header, then it will return a public link if the underlying storage entity
-is public and the ```Preference-Applied``` would not be returned.
+Note that if the `Prefer` header, then it will return a public link if the underlying storage entity
+is public and the `Preference-Applied` would not be returned.
