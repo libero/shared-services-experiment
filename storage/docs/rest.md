@@ -64,7 +64,7 @@ FILE DATA
 
 The returned Link header value is the public url if the underlying storage is public.
 
-## Retrieving a file meta data
+## Retrieving a file's meta data
 
 ### Public storage
 
